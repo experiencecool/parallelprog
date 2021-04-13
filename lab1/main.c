@@ -69,7 +69,17 @@ int main(int argc, char* argv[]) {
         for (size_t k = 0; k < N/2; k++){
             M2[k] = fabs(M1[k] - M2[k]);
         }
-
+        double temp = 0;
+        size_t j = 0;
+        for(size_t k=1;k<N/2;k++){
+            temp=M2[k];
+            j=k-1;
+            while((temp<M2[j])&&(j>=0)){
+                M2[j+1]=M2[j];
+                j=j-1;
+            }
+            M2[j+1]=temp;
+        }
         free(M1);
         free(M2);
     }
