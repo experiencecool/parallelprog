@@ -103,7 +103,7 @@ int main(int argc, char* argv[]) {
                 //printf("check_num {%d} / 2 != 0", check_num);
             }
         }
-        printf("%f ", sum);
+        // printf("%f ", sum);
         free(M1);
         free(M2);
     }
