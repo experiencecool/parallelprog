@@ -107,10 +107,10 @@ int main(int argc, char* argv[]) {
         free(M1);
         free(M2);
     }
-    printf("\n");
+    // printf("\n");
     gettimeofday(&T2, NULL);
     delta_ms = 1000*(T2.tv_sec - T1.tv_sec) + (T2.tv_usec - T1.tv_usec)/1000;
-    printf("\nN=%d. Milliseconds passed: %ld\n", N, delta_ms);
+    printf("\nN=%d. Milliseconds passed: %ld", N, delta_ms);
 
     return 0;
 }
