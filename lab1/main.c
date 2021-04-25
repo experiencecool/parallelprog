@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
             M1[j] = extended_random(p, 1, A);
             //printf("%f ", M1[j]);
         }
-        printf("\n");
+        //printf("\n");
         for (size_t k = 0; k < N/2; k++){
             M2[k] = extended_random(p, A, 10*A);
         }
@@ -80,9 +80,34 @@ int main(int argc, char* argv[]) {
             }
             M2[j+1]=temp;
         }
+        double min_num = 0;
+        for(size_t k=0;k<N/2;k++) {
+            if(M2[k] > 0){
+                min_num = M2[k];
+                break;
+            }
+        }
+        for(size_t k=1;k<N/2;k++) {
+            if(M2[k] < min_num){
+                min_num = M2[k];
+            }
+        }
+//        printf("%f", min_num);
+        double sum = 0;
+        for (size_t k = 0; k < N/2; k++){
+            int check_num = (int)(M2[k] / min_num);
+            //printf("%f | %f, %d ---", M2[k], min_num, check_num);
+            if(check_num % 2 == 0) {
+                sum += sin(M2[k]);
+            } else {
+                //printf("check_num {%d} / 2 != 0", check_num);
+            }
+        }
+        printf("%f ", sum);
         free(M1);
         free(M2);
     }
+    printf("\n");
     gettimeofday(&T2, NULL);
     delta_ms = 1000*(T2.tv_sec - T1.tv_sec) + (T2.tv_usec - T1.tv_usec)/1000;
     printf("\nN=%d. Milliseconds passed: %ld\n", N, delta_ms);
