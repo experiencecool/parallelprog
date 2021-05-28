@@ -1,7 +1,7 @@
 CXX = dpcpp
 CXXFLAGS = -O2 -g -std=c++17
 
-SRC = main.cpp
+SRC = main.cpp ippwrap.cpp
 EXE_NAME = ipptest
 # Signal proccesing depends on both: ippcore ippvm
 IMPORTS_AND_LINKS = -I $IPPROOT/include -L $IPPROOT/lib/intel64 -lippi -lipps -lippcore -lippvm
