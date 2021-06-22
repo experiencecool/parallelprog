@@ -1,5 +1,5 @@
 CXX = dpcpp
-CXXFLAGS = -O2 -g -std=c++17
+CXXFLAGS = -O3 -g -std=c++17
 
 SRC = main.cpp ippwrap.cpp
 EXE_NAME = ipptest
