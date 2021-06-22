@@ -19,16 +19,24 @@ int main(int argc, char* argv[])
 {
     ippInit();
 
-    int i, N;
+    int i, N, M;
     struct timeval T1, T2;
     long delta_ms;
 
-    if(argc <= 1){
+    if(argc <= 2){
         perror("Error: Invalid arguments\n");
         exit(1);
     } else {
         N = atoi(argv[1]);
+        M = atoi(argv[2]);
+        if (M > 8)
+        {
+            perror("Error: To many threads Specified\n");
+            exit(1);
+        }
+        ippSetNumThreads(M);
     }
+    
     gettimeofday(&T1, NULL);
     unsigned int *p = (unsigned int*) malloc(sizeof(unsigned int));
     for (i = 0; i < 50; i++){
@@ -110,7 +118,7 @@ int main(int argc, char* argv[])
     }
     gettimeofday(&T2, NULL);
     delta_ms = 1000*(T2.tv_sec - T1.tv_sec) + (T2.tv_usec - T1.tv_usec)/1000;
-    printf("N=%d. Milliseconds passed: %ld\n", N, delta_ms);
+    printf("N=%d, #Threads=%d. Milliseconds passed: %ld\n", N, M, delta_ms);
 
     return 0;
 }
