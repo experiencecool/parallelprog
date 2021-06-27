@@ -7,7 +7,7 @@
 
 #define A 240
 #define e 2.718281
-#define SHARED_PARAMS num_threads(4) default(none)
+#define SHARED_PARAMS(M) schedule(static, 1) num_threads(M) default(none)
 
 double extended_random(unsigned int *seedp, int min, int max) {
     return (rand_r(seedp) % (max + 1 - min)) + min;
@@ -22,15 +22,21 @@ void log_array(const char* msg, size_t start, size_t end, double *arr) {
 }
 
 int main(int argc, char* argv[]) {
-    int i, N;
+    int i, N, M;
     struct timeval T1, T2;
     long delta_ms;
 
-    if(argc <= 1){
-        fprintf(stderr, "%s", "Error: Invalid arguments\n");
+    if(argc <= 2){
+        perror("Error: Invalid arguments\n");
         exit(1);
     } else {
         N = atoi(argv[1]);
+        M = atoi(argv[2]);
+        if (M > 8)
+        {
+            perror("Error: To many threads Specified\n");
+            exit(1);
+        }
     }
     gettimeofday(&T1, NULL);
     unsigned int *p = (unsigned int *)malloc(sizeof(unsigned int));
@@ -54,27 +60,27 @@ int main(int argc, char* argv[]) {
         }
         // END: filling up arrays.
 
-        #pragma omp parallel for SHARED_PARAMS private(j) shared(M1, N)
+        #pragma omp parallel for SHARED_PARAMS(M) private(j) shared(M1, N)
         for (j = 0; j < N; j++){
             M1[j] = cbrt((M1[j]/e));
         }
-        #pragma omp parallel for SHARED_PARAMS private(j) shared(M2_copy, M2, N)
+        #pragma omp parallel for SHARED_PARAMS(M) private(j) shared(M2_copy, M2, N)
         for (j = 0; j < N/2; j++){
             M2_copy[j] = M2[j];
         }
-        #pragma omp parallel for SHARED_PARAMS private(j) shared(M2_copy, M2, N)
+        #pragma omp parallel for SHARED_PARAMS(M) private(j) shared(M2_copy, M2, N)
         for (j = 1; j < N/2; j++){
             M2[j] += M2_copy[j-1];
             M2[j] = pow(log10(M2[j]), e);
         }
-        #pragma omp parallel for SHARED_PARAMS private(j) shared(M1, M2, N)
+        #pragma omp parallel for SHARED_PARAMS(M) private(j) shared(M1, M2, N)
         for (j = 0; j < N/2; j++){
             M2[j] = fabs(M1[j] - M2[j]);
         }
         double temp = 0;
         j = 0;
         size_t k=1;
-        #pragma omp parallel for SHARED_PARAMS private(j, k, temp) shared(M1, M2, N)
+        #pragma omp parallel for SHARED_PARAMS(M) private(j, k, temp) shared(M1, M2, N)
         for(k=1;k<N/2;k++){
             temp=M2[k];
             j=k-1;
@@ -94,14 +100,14 @@ int main(int argc, char* argv[]) {
         }
         // END: looking for first positive number.
 
-        #pragma omp parallel for SHARED_PARAMS private(k) shared(M2, min_num, N)
+        #pragma omp parallel for SHARED_PARAMS(M) private(k) shared(M2, min_num, N)
         for(k=1;k<N/2;k++) {
             if(M2[k] < min_num){
                 min_num = M2[k];
             }
         }
         double sum = 0;
-        #pragma omp parallel for SHARED_PARAMS private(k) shared(M2, min_num, N) reduction (+:sum)
+        #pragma omp parallel for SHARED_PARAMS(M) private(k) shared(M2, min_num, N) reduction (+:sum)
         for (k = 0; k < N/2; k++){
             int check_num = (int)(M2[k] / min_num);
             if(check_num % 2 == 0) {
@@ -116,7 +122,8 @@ int main(int argc, char* argv[]) {
     }
     gettimeofday(&T2, NULL);
     delta_ms = 1000*(T2.tv_sec - T1.tv_sec) + (T2.tv_usec - T1.tv_usec)/1000;
-    printf("N=%d. Milliseconds passed: %ld\n", N, delta_ms);
+    //printf("N=%d. Milliseconds passed: %ld\n", N, delta_ms);
+    printf("%ld\n", delta_ms);
 
     return 0;
 }
